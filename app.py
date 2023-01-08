@@ -1,7 +1,11 @@
 import datetime
 import time
+import csv
 
 from functools import wraps
+from io import StringIO
+
+from flask import make_response
 from flask import Flask
 from flask import render_template
 from flask import request
@@ -15,14 +19,21 @@ if os.path.isfile('.env'):
     load_dotenv()
 
 app = Flask(__name__, template_folder='templates', static_folder="static")
-app.secret_key = 'dummysecrettrilathienkey'
+app.secret_key = os.environ.get('secret_key')
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error.html'), 404
+
 
 def login_required(func):
    @wraps(func)
    def wrapper(*args, **kwargs):
        if 'logged_in' not in session:
+           flash('Pentru a accesa aceasta pagina este necesara logarea')
            return redirect(url_for('render_sign_in'))
        elif 'logged_in' in session and session['logged_in'] == False:
+           flash('Pentru a accesa aceasta pagina este necesara logarea')
            return redirect(url_for('render_sign_in'))
        return func(*args, **kwargs)
    return wrapper
@@ -57,15 +68,99 @@ def render_reservations_view():
                                    password=os.environ.get('DATABASE_PASSWORD'))
     cur = conn.cursor()
     # Execute a SELECT query to retrieve the user's record
+    query = "SELECT tblfactura.seria, tblfactura.tipPlata, tblclienti.nume, tblclienti.prenume,tblcamera.descriere, tblrezervarecamera.nrAdulti, tblrezervarecamera.nrCopii, tblrezervare.dataCheckin, tblrezervare.dataCheckout, tblrezervare.codClient, tblrezervare.idRezervare, tblrezervarecamera.codRezervare, tblcamera.idCamera, tblrezervarecamera.codCamera, tblrezervare.idRezervare FROM tblfactura, tblrezervare , tblcamera , tblrezervarecamera , tblclienti WHERE tblrezervare.idRezervare=tblrezervarecamera.codRezervare AND tblrezervarecamera.codCamera=tblcamera.idCamera AND tblrezervare.codClient=tblclienti.idClient AND tblfactura.codRezervare=tblrezervare.idRezervare;"
+
+    cur.execute(query)
+    results = cur.fetchall()
+
+    # Close the cursor and connection
+    cur.close()
+    conn.close()
+
+    results_dict = [{'serie_factura': row[0],
+                     'tip_plata': row[1],
+                     'nume': row[2],
+                     'prenume': row[3],
+                     'descriere_camera': row[4],
+                     'adulti': row[5],
+                     'copii': row[6],
+                     'data_start': row[7],
+                     'data_stop': row[8],
+                     'id_rezervare': row[14]
+                     }
+                    for row in results]
+    # Render the template
+    return render_template('reservations_view.html', results=results_dict)
+
+
+@app.route('/success', methods=['GET'])
+def render_success():
+    get_flashed_messages()
+    return render_template('success.html')
+
+
+@app.route('/sterge_rezervarea', methods=['POST'])
+@login_required
+def delete_reservation():
+    # Perform the desired action
+    id_rezervare = request.form['id_rezervare']
+
+    # Connect to the database
+    conn = mysql.connector.connect(host=os.environ.get('DATABASE_HOST'),
+                                   database=os.environ.get('DATABASE_NAME'),
+                                   user=os.environ.get('DATABASE_USER'),
+                                   password=os.environ.get('DATABASE_PASSWORD'))
+    cur = conn.cursor()
+    # Execute a SELECT query to retrieve the user's record
+    # Define the DELETE statement
+    query = "DELETE FROM tblrezervare WHERE idRezervare = %s"
+    values = (id_rezervare,)
+
+    # Execute the DELETE statement
+    cur.execute(query, values)
+    conn.commit()
+
+    # Close the connection
+    conn.close()
+
+    # Connect to the database
+    conn = mysql.connector.connect(host=os.environ.get('DATABASE_HOST'),
+                                   database=os.environ.get('DATABASE_NAME'),
+                                   user=os.environ.get('DATABASE_USER'),
+                                   password=os.environ.get('DATABASE_PASSWORD'))
+    cur = conn.cursor()
+    # Execute a SELECT query to retrieve the user's record
+    # Define the DELETE statement
+    query = "DELETE FROM tblrezervarecamera WHERE codRezervare = %s"
+    values = (id_rezervare,)
+
+    # Execute the DELETE statement
+    cur.execute(query, values)
+    conn.commit()
+
+    # Close the connection
+    conn.close()
+    return redirect(url_for('render_reservations_view'))
+
+
+@app.route('/download')
+@login_required
+def download_reservations_success():
+    conn = mysql.connector.connect(host=os.environ.get('DATABASE_HOST'),
+                                   database=os.environ.get('DATABASE_NAME'),
+                                   user=os.environ.get('DATABASE_USER'),
+                                   password=os.environ.get('DATABASE_PASSWORD'))
+    cur = conn.cursor()
+    # Execute a SELECT query to retrieve the user's record
     # query = "SELECT tblfactura.seria, tblfactura.tipPlata, tblclienti.nume, tblclienti.prenume,tblcamera.descriere, " \
     #         "tblrezervarecamera.nrAdulti, tblrezervarecamera.nrCopii, tblrezervare.dataCheckin, " \
     #         "tblrezervare.dataCheckout, tblrezervare.codClient, tblrezervare.idRezervare, " \
-    #         "tblrezervarecamera.codRezervare, tblcamera.idCamera, tblrezervarecamera.codCamera FROM tblfactura, " \
+    #         "tblrezervarecamera.codRezervare, tblcamera.idCamera, tblrezervarecamera.codCamera, tblrezervare.idRezervare FROM tblfactura, " \
     #         "tblrezervare , tblcamera , tblrezervarecamera , tblclienti WHERE " \
     #         "tblrezervare.idRezervare=tblrezervarecamera.codRezervare AND " \
     #         "tblrezervarecamera.codCamera=tblcamera.idCamera AND tblrezervare.codClient=tblclienti.idClient AND " \
     #         "tblfactura.codRezervare=tblrezervare.idRezervare; "
-    query = "SELECT tblfactura.seria, tblfactura.tipPlata, tblclienti.nume, tblclienti.prenume,tblcamera.descriere, tblrezervarecamera.nrAdulti, tblrezervarecamera.nrCopii, tblrezervare.dataCheckin, tblrezervare.dataCheckout, tblrezervare.codClient, tblrezervare.idRezervare, tblrezervarecamera.codRezervare, tblcamera.idCamera, tblrezervarecamera.codCamera FROM tblfactura, tblrezervare , tblcamera , tblrezervarecamera , tblclienti WHERE tblrezervare.idRezervare=tblrezervarecamera.codRezervare AND tblrezervarecamera.codCamera=tblcamera.idCamera AND tblrezervare.codClient=tblclienti.idClient AND tblfactura.codRezervare=tblrezervare.idRezervare;"
+    query = "SELECT tblfactura.seria, tblfactura.tipPlata, tblclienti.nume, tblclienti.prenume,tblcamera.descriere, tblrezervarecamera.nrAdulti, tblrezervarecamera.nrCopii, tblrezervare.dataCheckin, tblrezervare.dataCheckout, tblrezervare.codClient, tblrezervare.idRezervare, tblrezervarecamera.codRezervare, tblcamera.idCamera, tblrezervarecamera.codCamera, tblrezervare.idRezervare FROM tblfactura, tblrezervare , tblcamera , tblrezervarecamera , tblclienti WHERE tblrezervare.idRezervare=tblrezervarecamera.codRezervare AND tblrezervarecamera.codCamera=tblcamera.idCamera AND tblrezervare.codClient=tblclienti.idClient AND tblfactura.codRezervare=tblrezervare.idRezervare;"
 
     cur.execute(query)
     results = cur.fetchall()
@@ -95,22 +190,24 @@ def render_reservations_view():
                      'adulti': row[5],
                      'copii': row[6],
                      'data_start': row[7],
-                     'data_stop': row[8]
+                     'data_stop': row[8],
+                     'id_rezervare': row[9]
                      }
                     for row in results]
-    # Render the template
-    return render_template('reservations_view.html', results=results_dict)
 
+    si = StringIO()
+    cw = csv.DictWriter(si, fieldnames=['serie_factura', 'tip_plata', 'nume', 'prenume', 'descriere_camera', 'adulti', 'copii', 'data_start', 'data_stop', 'id_rezervare'])
+    cw.writeheader()
+    cw.writerows(results_dict)
 
-@app.route('/success', methods=['GET'])
-def render_success():
-    get_flashed_messages()
-    return render_template('success.html')
+    response = make_response(si.getvalue())
+    response.headers['Content-Type'] = 'text/csv'
+    response.headers['Content-Disposition'] = 'attachment; filename=data.csv'
 
+    return response
 
 @app.route('/register_new_user', methods=['POST'])
 def register_new_user():
-    print('in register_new_user')
     name = request.form['name']
     first_name = request.form['first_name']
     cnp = request.form['cnp']
@@ -134,7 +231,7 @@ def register_new_user():
     cur.close()
     conn.close()
     session['logged_in'] = False
-    session['user'] = (name, first_name, cnp, phone, judet, localitate)
+    session['user'] = ''
 
     return render_template('cover.html', session=session)
 
@@ -175,7 +272,7 @@ def sign_in():
         return render_template('cover.html', session=session)
     else:
         # The username and password are incorrect
-        flash('Invalid username or password.')
+        flash('Combinatia de numar de telefon si cnp este incorecta. Te rugam sa incerci din nou!')
         return redirect(url_for('render_sign_in'))
 
 

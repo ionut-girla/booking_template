@@ -1,14 +1,18 @@
 <!doctype html>
-<html lang="en" class="h-100">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.108.0">
-    <title>Cover Template · Bootstrap v5.3</title>
-    <link href="../static/styles/rezervare.css" rel="stylesheet">
-    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/cover/">
+    <title>Album example · Bootstrap v5.3</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/album/">
+
+
+
+
 
 <link href="../static/assets/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -63,148 +67,146 @@
         white-space: nowrap;
         -webkit-overflow-scrolling: touch;
       }
-     @import "compass/css3";
-
-// More practical CSS...
-// using mobile first method (IE8,7 requires respond.js polyfill https://github.com/scottjehl/Respond)
-
-$breakpoint-alpha: 680px; // adjust to your needs
-
-.rwd-table {
-  margin: 1em 0;
-  min-width: 600px; // adjust to your needs
-
-  tr {
-    border-top: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-  }
-
-  th {
-    display: none; // for accessibility, use a visually hidden method here instead! Thanks, reddit!
-  }
-
-  td {
-    display: block;
-
-    &:first-child {
-      padding-top: .5em;
-    }
-    &:last-child {
-      padding-bottom: .5em;
-    }
-
-    &:before {
-      content: attr(data-th)": "; // who knew you could do this? The internet, that's who.
-      font-weight: bold;
-
-      // optional stuff to make it look nicer
-      width: 15.5em; // magic number :( adjust according to your own content
-      display: inline-block;
-      // end options
-
-      @media (min-width: $breakpoint-alpha) {
-        display: none;
-      }
-    }
-  }
-
-  th, td {
-    text-align: left;
-
-    @media (min-width: $breakpoint-alpha) {
-      display: table-cell;
-      padding: .25em .5em;
-
-      &:first-child {
-        padding-left: 0;
-      }
-
-      &:last-child {
-        padding-right: 0;
-      }
-    }
-
-  }
-
-
-}
-  tbody {
-    max-height: 300px;
-    overflow-y: auto;
-  }
     </style>
 
 
-
-    <!-- Custom styles for this template -->
-    <link href="../static/styles/cover.css" rel="stylesheet">
   </head>
-  <body class="d-flex h-100 text-center text-bg-dark">
+  <body>
 
-<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
-    <header class="mb-auto">
-    <div>
-      <a class="nav-link fw-bold float-md-start mb-0" href="/" >Home</a>
-      {% if session.get('user') %}
-        <p align="right">Welcome, {{ session['user'][1] }} {{ session['user'][2] }}!</p>
+<header>
+  <div class="collapse bg-dark" id="navbarHeader">
+    <div class="container">
+      <div class="row">
+                <div class="col-sm-8 col-md-7 py-4">
+                  {% if session.get('user') %}
+        <h4 class="text-white">Welcome, {{ session['user'][1] }} {{ session['user'][2] }}!</h4>
       {% endif %}
-      <nav class="nav nav-masthead justify-content-center float-md-end">
-        <a class="nav-link fw-bold py-1 px-0 active" aria-current="page" href="/entries">Camere</a>
-        {% if session.get('user')[7] in ['admin', 'superadmin'] %}
-          <a class="nav-link fw-bold py-1 px-0" href="/reservations_view">Rezervari existente</a>
+          <p class="text-muted">Add some information about the album below, the author, or any other background context. Make it a few sentences long so folks can pick up some informative tidbits. Then, link them off to some social networking sites or contact information.</p>
+        </div>
+        <div class="col-sm-4 offset-md-1 py-4">
+          <ul class="list-unstyled">
+          <li><a class="text-white" aria-current="page" href="/entries">Camere</a></li>
+            {% if session.get('user')[7] in ['admin', 'superadmin'] %}
+          <li><a class="text-white" href="/reservations_view">Rezervari existente</a></li>
         {% endif %}
-        {% if not session.get('user') %}
-          <a class="nav-link fw-bold py-1 px-0" href="/sign-in">Login</a>
-        {% endif %}
-        <a class="nav-link fw-bold py-1 px-0" href="/register_new_user">Register New user</a>
-        <a class="nav-link fw-bold py-1 px-0" href="/sign-out">Sign out!</a>
-      </nav>
+            {% if not session.get('user') %}
+              <li><a class="text-white" href="/sign-in">Login</a></li>
+            {% endif %}
+          <li><a class="text-white" href="/register_new_user">Register New user</a></li>
+          <li><a class="text-white" href="/sign-out">Sign out!</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
-  </header>
+  </div>
+  <div class="navbar navbar-dark bg-dark shadow-sm">
+    <div class="container">
+      <a href="/cover" class="navbar-brand d-flex align-items-center">
+        <strong>Home</strong>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+  </div>
+</header>
 
-  <main>
-    <h1>Rezervarile active in acest moment sunt:</h1>
-    <table class="rwd-table">
-  <thead>
-    <tr>
-      <th>Serie Factura</th>
-      <th>Tip Plata</th>
-      <th>Nume</th>
-      <th>Prenume</th>
-      <th width="900px">Descrierea Camerei</th>
-      <th>Numar Adulti</th>
-      <th>Numar Copii</th>
-      <th>Data CheckIn</th>
-      <th>Data CheckOut</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for result in results %}
-      <tr>
-        <td data-th="Serie Factura">{{ result['serie_factura'] }}</td>
-        <td data-th="Tip Plata">{{ result['tip_plata'] }}</td>
-        <td data-th="Nume">{{ result['nume'] }}</td>
-        <td data-th="Prenume">{{ result['prenume'] }}</td>
-        <td data-th="Descrierea Camerei" width="900px">{{ result['descriere_camera'] }}</td>
-        <td data-th="Numar Adulti">{{ result['adulti'] }}</td>
-        <td data-th="Numar Copii">{{ result['copii'] }}</td>
-        <td data-th="Data CheckIn">{{ result['data_start'] }}</td>
-        <td data-th="Data CheckOut">{{ result['data_stop'] }}</td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<main>
 
-  </main>
+  <section class="py-5 text-center container">
+    <div class="row py-lg-5">
+      <div class="col-lg-6 col-md-8 mx-auto">
+        <h1 class="fw-light">Camere disponibile pentru rezervare</h1>
+        <p class="lead text-muted">In continuare avem camerele noastre disponibile cu o scurta descriere pentru fiecare</p>
+        <p>
+          <form action="/download" method="GET">
+                      <button type="submit" class="btn btn-primary my-2">Descarca lista rezervarilor.</button>
+          </form>
+        </p>
+      </div>
+    </div>
+  </section>
 
-  <footer class="mt-auto text-white-50">
-    <p>Cover template for <a href="https://getbootstrap.com/" class="text-white">Bootstrap</a>, by <a href="https://twitter.com/mdo" class="text-white">@mdo</a>.</p>
-  </footer>
-</div>
+  <div class="album py-5 bg-light  align-items-center">
+    <div class="container">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        {% for result in results %}
+          <div class="col">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title">{{ result['nume'] }} {{ result['prenume'] }} cu factura {{ result['serie_factura'] }} achitat cu {{ result['tip_plata'] }}</h5>
+
+                {% if result['adulti'] in [0, '0'] %}
+                <p class="card-text">{{ result['descriere_camera'] }} in care sunt cazati {{ result['copii'] }} copii</p>
+                {% endif %}
+
+                {% if result['copii'] in [1, '1'] and result['adulti'] in [0, '0']%}
+                <p class="card-text">{{ result['descriere_camera'] }} in care este cazat un copil</p>
+                {% endif %}
+
+                {% if result['copii'] in [1, '1'] and result['adulti'] not in [0, '0', 1, '1']%}
+                <p class="card-text">{{ result['descriere_camera'] }} in care sunt cazati  {{ result['adulti'] }} adulti si un copil</p>
+                {% endif %}
+
+                {% if result['copii'] in [0, '0'] %}
+                <p class="card-text">{{ result['descriere_camera'] }} in care sunt cazati {{ result['adulti'] }} adulti </p>
+                {% endif %}
+
+                {% if result['adulti'] in [1, '1'] and result['copii'] in [0, '0']%}
+                <p class="card-text">{{ result['descriere_camera'] }} in care este cazat un adult</p>
+                {% endif %}
+
+                {% if result['adulti'] in [1, '1'] and result['copii'] not in [0, '0', 1, '1']%}
+                <p class="card-text">{{ result['descriere_camera'] }} in care sunt cazati  un adult si {{ result['copii'] }} copii</p>
+                {% endif %}
+
+                {% if result['adulti'] not in [0, '0', 1, '1'] and result['copii'] not in [0, '0', 1, '1']%}
+                <p class="card-text">{{ result['descriere_camera'] }} in care sunt cazati  {{ result['adulti'] }} adulti si {{ result['copii'] }} copii</p>
+                {% endif %}
+
+                <p class="card-text">Rezervarea este activa in perioada {{ result['data_start'] }} - {{ result['data_stop'] }} </p>
+                <div class="d-flex justify-content-between align-items-center">
+
+                  <div class="btn-group">
+                    <form action="/sterge_rezervarea" method="POST">
+                      <input type="hidden" name="id_rezervare" value="{{ result['id_rezervare'] }}">
+                      <button type="submit" class="btn btn-sm btn-outline-secondary">Sterge rezervarea!</button>
+                    </form>
+                  </div>
+                  <small class="text-muted"></small>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+        </div>
+      </div>
+    </div>
+
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="text-muted py-5">
+  <div class="container">
+    <p class="float-end mb-1">
+      <a class="fw-bold" href="#">Back to top</a>
+    </p>
+    <p class="mb-1" >
+          Hotelul Nostru<br>
+          Strada Hotelului, Nr. 1<br>
+          Orasul, Judetul<br>
+          Telefon: +40 000 000 000<br>
+          Email: contact@hotelulnostru.ro
+    </p>
+  </div>
+</footer>
 
 
+    <script src="../static/assets/dist/js/bootstrap.bundle.min.js"></script>
 
-</body>
 
+  </body>
 </html>
-

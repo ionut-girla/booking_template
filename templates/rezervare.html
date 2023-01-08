@@ -76,7 +76,7 @@
     <div>
       <a class="nav-link fw-bold float-md-start mb-0" href="/" >Home</a>
       {% if session.get('user') %}
-        <p>Welcome, {{ session['user'][1] }} {{ session['user'][2] }}!</p>
+        <p align="right">Welcome, {{ session['user'][1] }} {{ session['user'][2] }}!</p>
       {% endif %}
       <nav class="nav nav-masthead justify-content-center float-md-end">
         <a class="nav-link fw-bold py-1 px-0 active" aria-current="page" href="/entries">Camere</a>
@@ -136,8 +136,16 @@
   </main>
 
   <footer class="mt-auto text-white-50">
-    <p>Cover template for <a href="https://getbootstrap.com/" class="text-white">Bootstrap</a>, by <a href="https://twitter.com/mdo" class="text-white">@mdo</a>.</p>
-  </footer>
+      <p></p>
+      <p></p>
+      <p></p>
+    <p class="mb-1" >
+          Hotelul Nostru<br>
+          Strada Hotelului, Nr. 1<br>
+          Orasul, Judetul<br>
+          Telefon: +40 000 000 000<br>
+          Email: contact@hotelulnostru.ro
+    </p></footer>
 </div>
 
 
