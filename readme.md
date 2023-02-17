@@ -41,6 +41,4 @@ This Flask site was created by [Your Name Here].
 
 ![image](https://user-images.githubusercontent.com/71938499/219694432-334fef63-0356-4f38-b6be-3687a5cc2242.png)
 
-![image](https://user-images.githubusercontent.com/71938499/219694532-2f966485-198c-4090-bf11-28d8cdd44f2c.png)
-
 
