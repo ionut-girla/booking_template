@@ -18,7 +18,7 @@ To install the necessary dependencies for this Flask site, run the following com
 
 ```python
 pip install -r requirements.txt
-
+```
 
 ## Usage
 
@@ -26,7 +26,7 @@ To run the Flask site, use the following command:
 
 ```python
 flask run
-
+```
 By default, the site will be available at `http://127.0.0.1:5000/`.
 
 ## Credits
